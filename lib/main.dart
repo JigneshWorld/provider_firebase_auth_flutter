@@ -24,65 +24,73 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: MyHomePage(title: title),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of(context);
 
     Widget body;
     if (authProvider.isAuthenticated) {
-      body = Center(
-        child: Text(
-          "User Authenticated\n\n${authProvider.isAnonymous ?
-            "Anonymous" : "From - Facebook / Google / Email"}",
-          textAlign: TextAlign.center,
-        ),
+      body = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset('assets/images/welcome.png'),
+          SizedBox(height: 32,),
+          Text(
+            "Welcome to the world\nClick on floating action autton to sign out.",
+            textAlign: TextAlign.center,
+          ),
+        ],
       );
     } else {
-      body = Center(
-        child: Text("No authentication"),
+      body = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset('assets/images/login.png'),
+          SizedBox(height: 32,),
+          Text(
+            "Login to continue\nClick on floating action button to sign in anonymously.",
+            textAlign: TextAlign.center,
+          ),
+        ],
       );
     }
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         centerTitle: true,
       ),
       body: body,
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          FloatingActionButton(
-            onPressed: () {
-              authProvider.signInAnonymously();
-            },
-            tooltip: 'Sign In Anonymously',
-            child: Icon(Icons.account_circle),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              authProvider.signOut();
-            },
-            tooltip: 'Sign Out',
-            child: Icon(Icons.exit_to_app),
-          )
+          if (!authProvider.isAuthenticated)
+            FloatingActionButton(
+              onPressed: () {
+                authProvider.signInAnonymously();
+              },
+              tooltip: 'Sign In Anonymously',
+              child: Icon(Icons.account_circle),
+            ),
+          if (authProvider.isAuthenticated)
+            FloatingActionButton(
+              onPressed: () {
+                authProvider.signOut();
+              },
+              tooltip: 'Sign Out',
+              child: Icon(Icons.exit_to_app),
+            )
         ],
       ),
     );
